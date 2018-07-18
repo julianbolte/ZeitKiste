@@ -1,8 +1,7 @@
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
 
 public class gpio {
-
-	public static void main(String[] args) {
-		// Julian: Beispielklasse
-	}
+	final GpioController gpio = GpioFactory.getInstance();
 
 }
