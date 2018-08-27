@@ -18,5 +18,9 @@ public class gpio {
 	final GpioPinDigitalInput lichtschranke = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05,PinPullResistance.PULL_DOWN);
 	final GpioPinDigitalOutput led = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_06, "LED", PinState.HIGH);
 	
-	
-}
+	buttonM.addListener(new GpioPinListenerDigital() {
+	      public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+	        if((event.getState()==PinState.HIGH) ) {
+	        	
+	        }}});
+	          
