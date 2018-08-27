@@ -8,7 +8,6 @@ import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
-
 public class gpio {
 	final GpioController gpio = GpioFactory.getInstance();
 	final GpioPinDigitalInput buttonM = gpio.provisionDigitalInputPin(RaspiPin.GPIO_00,PinPullResistance.PULL_DOWN);
@@ -18,9 +17,58 @@ public class gpio {
 	final GpioPinDigitalInput lichtschranke = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05,PinPullResistance.PULL_DOWN);
 	final GpioPinDigitalOutput led = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_06, "LED", PinState.HIGH);
 	
-	buttonM.addListener(new GpioPinListenerDigital() {
-	      public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-	        if((event.getState()==PinState.HIGH) ) {
-	        	
-	        }}});
-	          
+	gpio(TimeCatcherFrame tc){
+		buttonM.addListener(new GpioPinListenerDigital(){
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event){
+				if (event.getState() == PinState.HIGH){
+					tc.m();
+				}
+			}
+		});
+		
+		buttonA.addListener(new GpioPinListenerDigital(){
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event){
+				if (event.getState() == PinState.HIGH){
+					tc.aok();
+				}
+			}
+		});
+		
+		buttonUp.addListener(new GpioPinListenerDigital(){
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event){
+				if (event.getState() == PinState.HIGH){
+					tc.up();
+				}
+			}
+		});
+		
+		buttonDown.addListener(new GpioPinListenerDigital(){
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event){
+				if (event.getState() == PinState.HIGH){
+					tc.down();
+				}
+			}
+		});
+		
+		lichtschranke.addListener(new GpioPinListenerDigital(){
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event){
+			if (event.getState() == PinState.HIGH){
+					led.setState(PinState.LOW);
+					tc.lichtschranke();
+					tc.setVirtLED(false);
+				}
+			else{
+				led.setState(PinState.HIGH);
+				tc.setVirtLED(true);
+			}
+		}
+	});
+		
+}
+	
+}   
