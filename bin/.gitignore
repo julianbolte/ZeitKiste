@@ -1,8 +1,10 @@
-/GPIO_COM.class
-/gpio.class
+/TimeCatcherFrame.class
+/database.class
 /gpio$1.class
 /gpio$2.class
 /gpio$3.class
 /gpio$4.class
 /gpio$5.class
-/TimeCatcherFrame.class
+/gpio.class
+/gui.class
+/timecatcher.class
