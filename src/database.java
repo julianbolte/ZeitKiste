@@ -1,15 +1,21 @@
-import java.sql.*;
-public class database {
+
+
+import java.sql.ResultSet;
+import java.sql.Statement;
+public class Database {
 
 	Statement stmt;       
 	ResultSet rs;
 	
-	public database() {
+	public Database() {
 		
 		
 	}
-	public void write() {
+	public void writeMan() {
 		
+		
+	}
+	public void writeAuto() {
 		
 	}
 }
