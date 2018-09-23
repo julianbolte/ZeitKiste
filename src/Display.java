@@ -38,22 +38,22 @@ public class Display extends Zeitkiste{
 	public synchronized void phyDisplayAktualisieren(String pZeileEins, String pZeileZwei, String pZeileDrei, String pZeileVier){
 		// Zeile 1 schreiben
 		Lcd.lcdPosition(lcdHandle, 0, 0);
-		Lcd.lcdPuts(lcdHandle, "                    "); 		// Displayzeile löschen
+		Lcd.lcdPuts(lcdHandle, "                    "); 		// Displayzeile lÃ¶schen
 		Lcd.lcdPosition(lcdHandle, 0, 0);
 		Lcd.lcdPuts(lcdHandle, pZeileEins); 					//Displayzeile beschreiben
 		//Zeile 2 schreiben
 		Lcd.lcdPosition(lcdHandle, 0, 1);
-		Lcd.lcdPuts(lcdHandle, "                    "); 		// Displayzeile löschen
+		Lcd.lcdPuts(lcdHandle, "                    "); 		// Displayzeile lÃ¶schen
 		Lcd.lcdPosition(lcdHandle, 0, 1);
 		Lcd.lcdPuts(lcdHandle, pZeileZwei); 					//Displayzeile beschreiben
 		//Zeile 3 schreiben
 		Lcd.lcdPosition(lcdHandle, 0, 2);
-		Lcd.lcdPuts(lcdHandle, "                    "); 		// Displayzeile löschen
+		Lcd.lcdPuts(lcdHandle, "                    "); 		// Displayzeile lÃ¶schen
 		Lcd.lcdPosition(lcdHandle, 0, 2);
 		Lcd.lcdPuts(lcdHandle, pZeileDrei); 					//Displayzeile beschreiben
        	//Zeile 4 schreiben
 		Lcd.lcdPosition(lcdHandle, 0, 3);
-		Lcd.lcdPuts(lcdHandle, "                    "); 		// Displayzeile löschen
+		Lcd.lcdPuts(lcdHandle, "                    "); 		// Displayzeile lÃ¶schen
 		Lcd.lcdPosition(lcdHandle, 0, 3);
 		Lcd.lcdPuts(lcdHandle, pZeileVier);						//Displayzeile beschreiben
 	}
