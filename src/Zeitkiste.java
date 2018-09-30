@@ -211,10 +211,7 @@ public class Zeitkiste {
 			props.store(out, null);	
 	}
 	public void warnungAusgeben(String pWarnung) {
-		zeileDrei = "Warnung vom Turm:";
-		zeileVier = pWarnung;
-		gui.virtDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
-		display.phyDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
+		System.out.println("Funktion noch nicht implementiert");
 	}
 	
 

@@ -1,5 +1,3 @@
-
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -26,19 +24,22 @@ public class Gui extends Zeitkiste implements MouseListener{
 	
 	public Gui(){
 		frame = new JFrame("Zeitkiste " + super.getStandort() + ", " + super.getLauf() + ". Lauf ");
+		frame.getContentPane().setBackground(new java.awt.Color(89, 98, 117));
 		try {
 			frame.setTitle(frame.getTitle() + InetAddress.getLocalHost().getHostAddress());
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		frame.setBounds(100, 100, 543, 187);
+		frame.setBounds(100, 100, 543, 190);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		JPanel panel = new JPanel();
+		panel.setBackground(new java.awt.Color(89, 98, 117));
 		panel.setBounds(20, 0, 475, 122);
 		panel.setLayout(null);
 		JPanel disPanel = new JPanel();
+		disPanel.setBackground(new java.awt.Color(196, 229, 56));
 		disPanel.setBounds(110, 26, 250, 96);
 		disPanel.setBorder(new LineBorder(new Color(0,0,0),2));
 		disPanel.setLayout(new BoxLayout(disPanel, BoxLayout.Y_AXIS));
@@ -46,7 +47,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		JButton btnUp = new JButton("\u2191");
 		btnUp.setBackground(Color.RED);
 		btnUp.setFont(new Font("Tahoma", Font.BOLD, 16));
-		btnUp.setBounds(10, 0, 50, 50);
+		btnUp.setBounds(10, 5, 50, 50);
 		btnUp.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent arg0) {
 				up();
@@ -66,7 +67,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		JButton btnAuto = new JButton("A");
 		btnAuto.setBackground(Color.RED);
 		btnAuto.setFont(new Font("Tahoma", Font.BOLD, 16));
-		btnAuto.setBounds(415, 0, 50, 50);
+		btnAuto.setBounds(415, 5, 50, 50);
 		btnAuto.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent arg0) {
 				auto();
@@ -89,24 +90,24 @@ public class Gui extends Zeitkiste implements MouseListener{
 		});
 		panel.add(btnMan);
 		lblZeileEins = new JLabel("Zeitkiste ver_0.1");
-		lblZeileEins.setFont(new Font("Monospaced", Font.BOLD, 16));
+		lblZeileEins.setFont(new Font("DialogInput", Font.BOLD, 16));
 		lblZeileEins.setHorizontalAlignment(SwingConstants.CENTER);
 		disPanel.add(lblZeileEins);
 		lblZeileZwei = new JLabel("Unkorrekte Angaben");
-		lblZeileZwei.setFont(new Font("Monospaced", Font.BOLD, 16));
+		lblZeileZwei.setFont(new Font("DialogInput", Font.BOLD, 16));
 		lblZeileZwei.setHorizontalAlignment(SwingConstants.CENTER);
 		disPanel.add(lblZeileZwei);
 		lblZeileDrei = new JLabel("bitte sofort melden");
-		lblZeileDrei.setFont(new Font("Monospaced", Font.BOLD, 16));
+		lblZeileDrei.setFont(new Font("DialogInput", Font.BOLD, 16));
 		lblZeileDrei.setHorizontalAlignment(SwingConstants.CENTER);
 		disPanel.add(lblZeileDrei);
 		lblZeileVier = new JLabel("Modus: " + super.getStandort() + ", " + super.getLauf() + ".Lauf");
-		lblZeileVier.setFont(new Font("Monospaced", Font.BOLD, 16));
+		lblZeileVier.setFont(new Font("DialogInput", Font.BOLD, 16));
 		lblZeileVier.setHorizontalAlignment(SwingConstants.CENTER);
 		disPanel.add(lblZeileVier);
 		JLabel virtLED = new JLabel("*");
 		virtLED.setForeground(Color.GREEN);
-		virtLED.setFont(new Font("Arial Black", Font.BOLD, 24));
+		virtLED.setFont(new Font("DialogInput", Font.BOLD, 24));
 		virtLED.setBounds(110, 6, 22, 27);
 		panel.add(virtLED);
 		JMenuBar menuBar= new JMenuBar();
@@ -127,6 +128,22 @@ public class Gui extends Zeitkiste implements MouseListener{
 			}
 		});
 		funktionen.add(warnungAusgeben);
+		JMenu liveUhr = new JMenu("LIVE Uhr");
+		menuBar.add(liveUhr);
+		JMenuItem liveAktivieren = new JMenuItem("Aktivieren / Deaktivieren");
+		liveAktivieren.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("Funktion noch nicht implememntiert");
+			}
+		});
+		liveUhr.add(liveAktivieren);
+		JMenuItem startenStoppen = new JMenuItem("Start- / Stopimpuls geben");
+		startenStoppen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("Funktion noch nicht implememntiert");
+			}
+		});
+		liveUhr.add(startenStoppen);
 		JMenu einstellungen = new JMenu("Einstellungen");
 		menuBar.add(Box.createHorizontalGlue());
 		menuBar.add(einstellungen);
@@ -161,13 +178,6 @@ public class Gui extends Zeitkiste implements MouseListener{
 			}
 		});
 		einstellungen.add(lauf);
-		JMenuItem liveUhr = new JMenuItem("LiveUhr ändern");
-		liveUhr.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("Funktionalität noch nicht implementiert!");
-			}
-		});
-		einstellungen.add(liveUhr);
 
 		panel.add(disPanel);
 		frame.add(panel);
