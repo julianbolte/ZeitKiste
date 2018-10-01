@@ -35,6 +35,14 @@ public class Display extends Zeitkiste{
 		Lcd.lcdPuts(lcdHandle,"Modus: " + super.getStandort() + ", " + super.getLauf() + ".Lauf");
     }
 
+    public synchronized void phyErsteZeileAktualisieren(String pZeileEins){
+		// Zeile 1 schreiben
+		Lcd.lcdPosition(lcdHandle, 0, 0);
+		Lcd.lcdPuts(lcdHandle, "                    "); 		// Displayzeile löschen
+		Lcd.lcdPosition(lcdHandle, 0, 0);
+		Lcd.lcdPuts(lcdHandle, pZeileEins); 					//Displayzeile beschreiben
+	}
+    
 	public synchronized void phyDisplayAktualisieren(String pZeileEins, String pZeileZwei, String pZeileDrei, String pZeileVier){
 		// Zeile 1 schreiben
 		Lcd.lcdPosition(lcdHandle, 0, 0);

@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="C:/pi4j_lib/pi4j-gpio-extension.jar"/>
 	<classpathentry kind="lib" path="C:/pi4j_lib/pi4j-gpio-extension-javadoc.jar"/>
 	<classpathentry kind="lib" path="C:/pi4j_lib/pi4j-gpio-extension-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/julia/Desktop/mysql-connector-java-8.0.12.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

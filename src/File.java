@@ -24,7 +24,6 @@ public class File {
 	public void write(int pStartnummer, long pZeit) throws IOException{
 		SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
 	    String uhrzeit = date.format(new Date());
-	    System.out.println(uhrzeit);
 		try {
 			bw.write(uhrzeit + ";" + pStartnummer + ";" + pZeit);
 			bw.newLine();

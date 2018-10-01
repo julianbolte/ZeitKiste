@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.UnknownHostException;
 
 import javax.swing.*;
@@ -20,6 +19,8 @@ public class Gui extends Zeitkiste implements MouseListener{
 	private JLabel lblZeileZwei;
 	private JLabel lblZeileDrei;
 	private JLabel lblZeileVier;
+	@SuppressWarnings("unused") //Java ist dumm
+	private PopUpFenster popup;
 
 	
 	public Gui(){
@@ -117,14 +118,14 @@ public class Gui extends Zeitkiste implements MouseListener{
 		JMenuItem stnrWechsel = new JMenuItem("Startnummer springen");
 		stnrWechsel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				PopUpFenster popup = new PopUpFenster("ZUSTNRSPRINGEN");
+				popup = new PopUpFenster("ZUSTNRSPRINGEN");
 			}
 		});
 		funktionen.add(stnrWechsel);
 		JMenuItem warnungAusgeben = new JMenuItem("Warnung ausgeben");
 		warnungAusgeben.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				PopUpFenster popup = new PopUpFenster("WARNUNGAUSGEBEN");
+				popup = new PopUpFenster("WARNUNGAUSGEBEN");
 			}
 		});
 		funktionen.add(warnungAusgeben);
@@ -178,12 +179,9 @@ public class Gui extends Zeitkiste implements MouseListener{
 			}
 		});
 		einstellungen.add(lauf);
-
 		panel.add(disPanel);
 		frame.add(panel);
 		frame.setVisible(true);
-		System.out.println("GUI erstellt!");
-		
 	}
 	public void up() {
 		super.pressedUp();
@@ -196,6 +194,9 @@ public class Gui extends Zeitkiste implements MouseListener{
 	}
 	public void man() throws IOException {
 		super.manAusgeloest();
+	}
+	public void virtErsteZeileAktualisieren(String pZeileEins) {
+		lblZeileEins.setText(pZeileEins);
 	}
 	public void virtDisplayAktualisieren(String pZeileEins, String pZeileZwei, String pZeileDrei, String pZeileVier) {
 		lblZeileEins.setText(pZeileEins);
@@ -224,6 +225,31 @@ public class Gui extends Zeitkiste implements MouseListener{
 			System.out.println("Error Ocurred: Unbekannte Änderung erwünscht!"); //Fehlermeldung ausgeben
 		}
 		System.out.println("Einstellungen wurden geändert: " + super.getStandort() + ", " + super.getLauf() + ". Lauf");
+	}
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
