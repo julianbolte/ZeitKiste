@@ -44,7 +44,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		disPanel.setBounds(110, 26, 250, 96);
 		disPanel.setBorder(new LineBorder(new Color(0,0,0),2));
 		disPanel.setLayout(new BoxLayout(disPanel, BoxLayout.Y_AXIS));
-		
+
 		JButton btnUp = new JButton("\u2191");
 		btnUp.setBackground(Color.RED);
 		btnUp.setFont(new Font("Tahoma", Font.BOLD, 16));
@@ -112,6 +112,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		virtLED.setBounds(110, 6, 22, 27);
 		panel.add(virtLED);
 		JMenuBar menuBar= new JMenuBar();
+		menuBar.setBorder(new LineBorder(new Color(89,98,117),2));
 		frame.setJMenuBar(menuBar);
 		JMenu funktionen = new JMenu("Funktionen");
 		menuBar.add(funktionen);
