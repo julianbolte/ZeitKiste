@@ -112,9 +112,11 @@ public class Gui extends Zeitkiste implements MouseListener{
 		virtLED.setBounds(110, 6, 22, 27);
 		panel.add(virtLED);
 		JMenuBar menuBar= new JMenuBar();
-		menuBar.setBorder(new LineBorder(new Color(89,98,117),2));
+		menuBar.setBackground(new java.awt.Color(89,98,117));
+		menuBar.setBorder(new LineBorder(new java.awt.Color(89,98,117),2));
 		frame.setJMenuBar(menuBar);
 		JMenu funktionen = new JMenu("Funktionen");
+		funktionen.setForeground(java.awt.Color.WHITE);
 		menuBar.add(funktionen);
 		JMenuItem stnrWechsel = new JMenuItem("Startnummer springen");
 		stnrWechsel.addActionListener(new ActionListener() {
@@ -131,6 +133,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		});
 		funktionen.add(warnungAusgeben);
 		JMenu liveUhr = new JMenu("LIVE Uhr");
+		liveUhr.setForeground(java.awt.Color.WHITE);
 		menuBar.add(liveUhr);
 		JMenuItem liveAktivieren = new JMenuItem("Aktivieren / Deaktivieren");
 		liveAktivieren.addActionListener(new ActionListener() {
@@ -147,6 +150,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		});
 		liveUhr.add(startenStoppen);
 		JMenu einstellungen = new JMenu("Einstellungen");
+		einstellungen.setForeground(java.awt.Color.WHITE);
 		menuBar.add(Box.createHorizontalGlue());
 		menuBar.add(einstellungen);
 		JMenuItem startliste = new JMenuItem("Neue Startliste laden");
