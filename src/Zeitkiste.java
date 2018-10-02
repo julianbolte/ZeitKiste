@@ -59,6 +59,7 @@ public class Zeitkiste {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
+				logView.write("!!   Anwendung wird heruntergefahren!");
 				connHandler.closeConnections();
 				webSocketServer.close();
 				// TODO: close database connection
@@ -104,10 +105,10 @@ public class Zeitkiste {
 			} else if (manZeitGenommen == false) {
 				ersteZeileAktualisieren("       ", disZeit(letzteAutoZeit));
 			}
-			logView.write("     Auto    " + df.format(startnummer) + " " + letzteAutoZeit);
+			logView.write("     Auto    " + df.format(startnummer) + "   " + letzteAutoZeit);
 		} else {
 			letzteAutoZeit = System.currentTimeMillis();
-			logView.write("!!   Auto    " + df.format(startnummer) + " " + letzteAutoZeit + " unerwartet");
+			logView.write("!!   Auto    " + df.format(startnummer) + "   " + letzteAutoZeit + "   unerwartet");
 		}
 	}
 
@@ -124,9 +125,9 @@ public class Zeitkiste {
 			} else if (autoZeitGenommen == false && lsScharf == false) {
 				ersteZeileAktualisieren(disZeit(letzteManZeit), "");
 			}
-			logView.write("     Man     " + df.format(startnummer) + " " + letzteManZeit);
+			logView.write("     Man     " + df.format(startnummer) + "   " + letzteManZeit);
 		} else {
-			logView.write("!!   Man     " + df.format(startnummer) + " " + System.currentTimeMillis() + " unerwartet");
+			logView.write("!!   Man     " + df.format(startnummer) + "   " + System.currentTimeMillis() + "   unerwartet");
 		}
 	}
 
