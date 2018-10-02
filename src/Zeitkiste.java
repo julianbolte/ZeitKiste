@@ -20,6 +20,7 @@ public class Zeitkiste {
 	private static Startliste startliste;
 	private static Properties props;
 	private static String standort;
+	private static LogView logView;
 	private static DecimalFormat df = new DecimalFormat("000");;
 	private static int lauf;
 	private int aktuellerIndex = 0;
@@ -54,15 +55,17 @@ public class Zeitkiste {
 		display = new Display();
 		displayAktualisieren();
 		ersteZeileAktualisieren("", "");
+		logView = new LogView();
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				connHandler.closeConnections();
 				webSocketServer.close();
 				// TODO: close database connection
+				logView.close();
 			}
 		});
-		System.out.println(aktuelleZeit() + "Zeitkiste " + getStandort() + ", " + getLauf() + ". Lauf ist einsatzbereit!");
+		logView.write("Zeitkiste " + getStandort() + ", " + getLauf() + ". Lauf ist einsatzbereit!");
 	}
 
 	public static void einstellungenAendern(String pStandort, int pLauf) throws IOException {
@@ -81,11 +84,9 @@ public class Zeitkiste {
 			if (lsScharf == false && manZeitGenommen == false) {
 				ersteZeileAktualisieren("       ", "*******");
 				lsScharf = true;
-				System.out.println("Lichtschranke wurde scharfgestellt f�r Startnummer: " + startnummer);
 			} else if (lsScharf == false && manZeitGenommen == true) {
 				ersteZeileAktualisieren(disZeit(letzteManZeit), "*******");
 				lsScharf = true;
-				System.out.println("Lichtschranke wurde scharfgestellt f�r Startnummer: " + startnummer);
 			}
 		}
 	}
@@ -93,12 +94,8 @@ public class Zeitkiste {
 	public void lsAusgeloest() throws IOException {
 		if (lsScharf == true) {
 			letzteAutoZeit = System.currentTimeMillis(); // Zeit in Variable
-															// sichern
 			fileAuto.write(startnummer, letzteManZeit); // Zeit in Datei sichern
-			lsScharf = false; // Lichtschranke deaktivieren um Doppelausl�sung
-								// zu vermeiden
-
-			// Live-Timer benachrichtigen
+			lsScharf = false; // Lichtschranke deaktivieren 
 			connHandler.sendToAll(startnummer + "/" + Math.round(letzteAutoZeit / 10d));
 			database.writeAuto();
 			autoZeitGenommen = true;
@@ -107,20 +104,17 @@ public class Zeitkiste {
 			} else if (manZeitGenommen == false) {
 				ersteZeileAktualisieren("       ", disZeit(letzteAutoZeit));
 			}
-			System.out.println("Lichtschranke wurde erwartet ausgel�st:");
-			System.out.println(startnummer + " : " + letzteAutoZeit);
+			logView.write("     Auto    " + df.format(startnummer) + " " + letzteAutoZeit);
 		} else {
 			letzteAutoZeit = System.currentTimeMillis();
-			System.out.println("Lichtschranke wurde unerwartet ausgel�st:");
-			System.out.println(startnummer + " : " + letzteAutoZeit);
+			logView.write("!!   Auto    " + df.format(startnummer) + " " + letzteAutoZeit + " unerwartet");
 		}
 	}
 
 	public void manAusgeloest() throws IOException {
 		if (manZeitGenommen == false) {
-			letzteManZeit = System.currentTimeMillis(); // Zeit in Variable
-														// sichern
-			fileMan.write(startnummer, letzteManZeit); // Zeit in Datei sichern
+			letzteManZeit = System.currentTimeMillis();
+			fileMan.write(startnummer, letzteManZeit);
 			database.writeMan();
 			manZeitGenommen = true;
 			if (autoZeitGenommen == true) {
@@ -130,10 +124,9 @@ public class Zeitkiste {
 			} else if (autoZeitGenommen == false && lsScharf == false) {
 				ersteZeileAktualisieren(disZeit(letzteManZeit), "");
 			}
-			System.out.println("Manuelle Zeitnahme wurde erwartet ausgel�st:");
-			System.out.println(startnummer + " : " + letzteManZeit);
+			logView.write("     Man     " + df.format(startnummer) + " " + letzteManZeit);
 		} else {
-			System.out.println("Zweite Manuelle Zeit genommen f�r Startnummer " + startnummer + ", " + System.currentTimeMillis());
+			logView.write("!!   Man     " + df.format(startnummer) + " " + System.currentTimeMillis() + " unerwartet");
 		}
 	}
 

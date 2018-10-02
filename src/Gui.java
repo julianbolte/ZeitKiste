@@ -21,8 +21,6 @@ public class Gui extends Zeitkiste implements MouseListener{
 	private JLabel lblZeileVier;
 	@SuppressWarnings("unused") //Java ist dumm
 	private PopUpFenster popup;
-	private JTextArea textArea;
-	private JScrollPane scroll;
 
 	
 	public Gui(){
