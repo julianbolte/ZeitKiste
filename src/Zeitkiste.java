@@ -1,10 +1,10 @@
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
-
 import javax.swing.JOptionPane;
 
 public class Zeitkiste {
@@ -31,34 +31,30 @@ public class Zeitkiste {
 	private static boolean autoZeitGenommen = false;
 	// private static String disLeft;
 	// private static String disRight;
-	private String zeileEins = "";
-	private String zeileZwei = "";
-	private String zeileDrei = "";
-	private String zeileVier = "";
+	private static String zeileEins = "";
+	private static String zeileZwei = "";
+	private static String zeileDrei = "";
+	private static String zeileVier = "";
 
 	public static void main(String[] args) throws IOException {
 		props = new Properties();
 		FileInputStream in = new FileInputStream("zeitkiste.ini");
 		props.load(in);
 		standort = props.getProperty("standort"); // Einstellung des Standortes
-		lauf = Integer.parseInt(props.getProperty("lauf")); // Einstellung des
-															// Laufes
-
+		lauf = Integer.parseInt(props.getProperty("lauf")); // Einstellung des Laufes
 		gui = new Gui();
 		startliste = new Startliste();
 		database = new Database();
-
 		// WebSocketServer für Live-timer
 		connHandler = new ConnectionHandler();
-		webSocketServer = new WebSocketServer(connHandler, standort.equals("start") ? 2001 : 2002);
-
+		webSocketServer = new WebSocketServer(connHandler, standort.equals("Start") ? 2001 : 2002);
 		gpio = new Gpio();
 		fileMan = new File(standort + "_" + lauf + "_man");
 		fileAuto = new File(standort + "_" + lauf + "_auto");
 		display = new Display();
-
+		displayAktualisieren();
+		ersteZeileAktualisieren("", "");
 		Runtime.getRuntime().addShutdownHook(new Thread() {
-
 			@Override
 			public void run() {
 				connHandler.closeConnections();
@@ -66,8 +62,7 @@ public class Zeitkiste {
 				// TODO: close database connection
 			}
 		});
-
-		System.out.println("Zeitkiste " + getStandort() + ", " + getLauf() + ". Lauf ist einsatzbereit!");
+		System.out.println(aktuelleZeit() + "Zeitkiste " + getStandort() + ", " + getLauf() + ". Lauf ist einsatzbereit!");
 	}
 
 	public static void einstellungenAendern(String pStandort, int pLauf) throws IOException {
@@ -84,11 +79,11 @@ public class Zeitkiste {
 	public void setLsScharf() {
 		if (autoZeitGenommen == false) {
 			if (lsScharf == false && manZeitGenommen == false) {
-				this.ersteZeileAktualisieren("       ", "*******");
+				ersteZeileAktualisieren("       ", "*******");
 				lsScharf = true;
 				System.out.println("Lichtschranke wurde scharfgestellt f�r Startnummer: " + startnummer);
 			} else if (lsScharf == false && manZeitGenommen == true) {
-				this.ersteZeileAktualisieren(disZeit(letzteManZeit), "*******");
+				ersteZeileAktualisieren(disZeit(letzteManZeit), "*******");
 				lsScharf = true;
 				System.out.println("Lichtschranke wurde scharfgestellt f�r Startnummer: " + startnummer);
 			}
@@ -108,9 +103,9 @@ public class Zeitkiste {
 			database.writeAuto();
 			autoZeitGenommen = true;
 			if (manZeitGenommen == true) {
-				this.ersteZeileAktualisieren(disZeit(letzteManZeit), disZeit(letzteAutoZeit));
+				ersteZeileAktualisieren(disZeit(letzteManZeit), disZeit(letzteAutoZeit));
 			} else if (manZeitGenommen == false) {
-				this.ersteZeileAktualisieren("       ", disZeit(letzteAutoZeit));
+				ersteZeileAktualisieren("       ", disZeit(letzteAutoZeit));
 			}
 			System.out.println("Lichtschranke wurde erwartet ausgel�st:");
 			System.out.println(startnummer + " : " + letzteAutoZeit);
@@ -129,11 +124,11 @@ public class Zeitkiste {
 			database.writeMan();
 			manZeitGenommen = true;
 			if (autoZeitGenommen == true) {
-				this.ersteZeileAktualisieren(disZeit(letzteManZeit), disZeit(letzteAutoZeit));
+				ersteZeileAktualisieren(disZeit(letzteManZeit), disZeit(letzteAutoZeit));
 			} else if (autoZeitGenommen == false && lsScharf == true) {
-				this.ersteZeileAktualisieren(disZeit(letzteManZeit), "*******");
+				ersteZeileAktualisieren(disZeit(letzteManZeit), "*******");
 			} else if (autoZeitGenommen == false && lsScharf == false) {
-				this.ersteZeileAktualisieren(disZeit(letzteManZeit), "       ");
+				ersteZeileAktualisieren(disZeit(letzteManZeit), "");
 			}
 			System.out.println("Manuelle Zeitnahme wurde erwartet ausgel�st:");
 			System.out.println(startnummer + " : " + letzteManZeit);
@@ -150,9 +145,9 @@ public class Zeitkiste {
 		startnummer = startliste.getStnrListe().get(aktuellerIndex);
 		lsScharf = false;
 		if (manZeitGenommen == true || autoZeitGenommen == true) {
-			this.displayAktualisieren();
+			displayAktualisieren();
 		} else {
-			this.ersteZeileAktualisieren("", "");
+			ersteZeileAktualisieren("", "");
 		}
 		manZeitGenommen = false;
 		autoZeitGenommen = false;
@@ -168,9 +163,9 @@ public class Zeitkiste {
 		startnummer = startliste.getStnrListe().get(aktuellerIndex);
 		lsScharf = false;
 		if (manZeitGenommen == true || autoZeitGenommen == true) {
-			this.displayAktualisieren();
+			displayAktualisieren();
 		} else {
-			this.ersteZeileAktualisieren("", "");
+			ersteZeileAktualisieren("", "");
 		}
 		manZeitGenommen = false;
 		autoZeitGenommen = false;
@@ -184,9 +179,9 @@ public class Zeitkiste {
 			aktuellerIndex = startliste.getStnrListe().indexOf(pStartnummer);
 			startnummer = pStartnummer;
 			if (manZeitGenommen == true || autoZeitGenommen == true) {
-				this.displayAktualisieren();
+				displayAktualisieren();
 			} else {
-				this.ersteZeileAktualisieren("       ", "       ");
+				ersteZeileAktualisieren("", "");
 			}
 			manZeitGenommen = false;
 			autoZeitGenommen = false;
@@ -197,17 +192,17 @@ public class Zeitkiste {
 		}
 	}
 
-	public void ersteZeileAktualisieren(String pDisLeft, String pDisRight) {
+	public static void ersteZeileAktualisieren(String pDisLeft, String pDisRight) {
 		zeileEins = df.format(startnummer) + ": " + pDisLeft + " " + pDisRight;
-		gui.virtDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
-		display.phyDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
+		gui.virtErsteZeileAktualisieren(zeileEins);
+		display.phyErsteZeileAktualisieren(zeileEins);
 	}
 
-	public void displayAktualisieren() {
+	public static void displayAktualisieren() {
 		zeileVier = zeileDrei;
 		zeileDrei = zeileZwei;
 		zeileZwei = zeileEins;
-		this.ersteZeileAktualisieren("       ", "        ");
+		ersteZeileAktualisieren("       ", "        ");
 		gui.virtDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
 		display.phyDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
 	}
@@ -249,6 +244,11 @@ public class Zeitkiste {
 		zeileVier = pWarnung;
 		gui.virtDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
 		display.phyDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
+	}
+	
+	public static String aktuelleZeit() {
+		SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
+	    return date.format(new Date());
 	}
 
 }

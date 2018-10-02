@@ -21,6 +21,8 @@ public class Gui extends Zeitkiste implements MouseListener{
 	private JLabel lblZeileVier;
 	@SuppressWarnings("unused") //Java ist dumm
 	private PopUpFenster popup;
+	private JTextArea textArea;
+	private JScrollPane scroll;
 
 	
 	public Gui(){
@@ -33,6 +35,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 			e.printStackTrace();
 		}
 		frame.setBounds(100, 100, 543, 190);
+		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		JPanel panel = new JPanel();
@@ -47,6 +50,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 
 		JButton btnUp = new JButton("\u2191");
 		btnUp.setBackground(Color.RED);
+		btnUp.setBorder(new LineBorder(new Color(0,0,0),2));
 		btnUp.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnUp.setBounds(10, 5, 50, 50);
 		btnUp.addMouseListener(new MouseAdapter() {
@@ -57,6 +61,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		panel.add(btnUp);
 		JButton btnDown = new JButton("\u2193");
 		btnDown.setBackground(Color.RED);
+		btnDown.setBorder(new LineBorder(new Color(0,0,0),2));
 		btnDown.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnDown.setBounds(10, 72, 50, 50);
 		btnDown.addMouseListener(new MouseAdapter() {
@@ -67,6 +72,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		panel.add(btnDown);
 		JButton btnAuto = new JButton("A");
 		btnAuto.setBackground(Color.RED);
+		btnAuto.setBorder(new LineBorder(new Color(0,0,0),2));
 		btnAuto.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnAuto.setBounds(415, 5, 50, 50);
 		btnAuto.addMouseListener(new MouseAdapter() {
@@ -77,6 +83,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		panel.add(btnAuto);
 		JButton btnMan = new JButton("M");
 		btnMan.setBackground(Color.GREEN);
+		btnMan.setBorder(new LineBorder(new Color(0,0,0),2));
 		btnMan.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnMan.setBounds(415, 72, 50, 50);
 		btnMan.addMouseListener(new MouseAdapter() {
