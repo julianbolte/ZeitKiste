@@ -7,7 +7,7 @@ import javax.swing.border.LineBorder;
 
 public class LogView {
 	
-	private static JFrame frame;
+	public static JFrame frame;
 	private static JPanel panel;
 	private static JLabel label;
 	private static JTextArea textArea;

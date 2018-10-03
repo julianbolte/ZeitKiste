@@ -8,6 +8,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -34,7 +35,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		}
 		frame.setBounds(100, 100, 543, 190);
 		frame.setResizable(false);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		JPanel panel = new JPanel();
 		panel.setBackground(new java.awt.Color(89, 98, 117));
@@ -189,6 +190,18 @@ public class Gui extends Zeitkiste implements MouseListener{
 			}
 		});
 		einstellungen.add(lauf);
+		JMenuItem close = new JMenuItem("Lauf ändern");
+		close.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		einstellungen.add(close);
 		panel.add(disPanel);
 		frame.add(panel);
 		frame.setVisible(true);
@@ -235,6 +248,11 @@ public class Gui extends Zeitkiste implements MouseListener{
 			System.out.println("Error Ocurred: Unbekannte Änderung erwünscht!"); //Fehlermeldung ausgeben
 		}
 		System.out.println("Einstellungen wurden geändert: " + super.getStandort() + ", " + super.getLauf() + ". Lauf");
+	}
+	
+	public void close() throws SQLException {
+		frame.dispose();
+		super.close();
 	}
 	@Override
 	public void mouseClicked(MouseEvent arg0) {

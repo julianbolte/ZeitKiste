@@ -1,6 +1,7 @@
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,16 +57,6 @@ public class Zeitkiste {
 		displayAktualisieren();
 		ersteZeileAktualisieren("", "");
 		logView = new LogView();
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				logView.write("!!   Anwendung wird heruntergefahren!");
-				connHandler.closeConnections();
-				webSocketServer.close();
-				// TODO: close database connection
-				logView.close();
-			}
-		});
 		logView.write("Zeitkiste " + getStandort() + ", " + getLauf() + ". Lauf ist einsatzbereit!");
 	}
 
@@ -98,7 +89,6 @@ public class Zeitkiste {
 			fileAuto.write(startnummer, letzteManZeit); // Zeit in Datei sichern
 			lsScharf = false; // Lichtschranke deaktivieren 
 			connHandler.sendToAll(startnummer + "/" + Math.round(letzteAutoZeit / 10d));
-			database.writeAuto();
 			autoZeitGenommen = true;
 			if (manZeitGenommen == true) {
 				ersteZeileAktualisieren(disZeit(letzteManZeit), disZeit(letzteAutoZeit));
@@ -116,7 +106,6 @@ public class Zeitkiste {
 		if (manZeitGenommen == false) {
 			letzteManZeit = System.currentTimeMillis();
 			fileMan.write(startnummer, letzteManZeit);
-			database.writeMan();
 			manZeitGenommen = true;
 			if (autoZeitGenommen == true) {
 				ersteZeileAktualisieren(disZeit(letzteManZeit), disZeit(letzteAutoZeit));
@@ -243,6 +232,13 @@ public class Zeitkiste {
 	public static String aktuelleZeit() {
 		SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
 	    return date.format(new Date());
+	}
+	
+	public void close() throws SQLException {
+		webSocketServer.close();
+		connHandler.closeConnections();
+		database.close();
+		logView.close();
 	}
 
 }
