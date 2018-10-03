@@ -46,8 +46,7 @@ public class Zeitkiste {
 		lauf = Integer.parseInt(props.getProperty("lauf")); // Einstellung des Laufes
 		gui = new Gui();
 		startliste = new Startliste();
-		database = new Database();
-		// WebSocketServer für Live-timer
+		database = new Database(props.getProperty("dpip"));
 		connHandler = new ConnectionHandler();
 		webSocketServer = new WebSocketServer(connHandler, standort.equals("Start") ? 2001 : 2002);
 		gpio = new Gpio();

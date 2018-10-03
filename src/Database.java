@@ -54,26 +54,6 @@ public class Database {
 			System.out.println(aktuelleUhrzeit() + " DB-F : " + pStnr + " " + lostInetMan[pStnr] + " " + lostInetMan[pStnr]);
 			e.printStackTrace();
 		}
-		try {
-			if (suc < 1) {
-				lostInetMan[pStnr] = pMan;
-				lostInetAuto[pStnr] = pAuto;
-				System.out.println(aktuelleUhrzeit() + " DB-F : " + pStnr + " " + lostInetMan[pStnr] + " " + lostInetMan[pStnr]);
-			} else {
-				System.out.println("Übertragung erfolgreich");
-				for (int i=1;i==500;i++) {
-					if (lostInetMan[i] != 0) {
-						/* suc = stmt.executeUpdate("INSERT INTO `test` (`id`, `text`) VALUES (NULL, '" + lostInetMan[i] + "')");
-						if (suc == 1) {
-							lostInetMan[i] = 0;
-							lostInetAuto[i] = 0;
-						} */
-					}
-				}
-			}
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
 	}
 	
 	public void close() throws SQLException {
