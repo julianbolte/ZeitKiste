@@ -25,34 +25,34 @@ public class Zeitkiste {
 	private static DecimalFormat df = new DecimalFormat("000");;
 	private static int lauf;
 	private int aktuellerIndex = 0;
-	private static int startnummer;
+	private static int startnummer = 1;
 	private long letzteAutoZeit;
 	private static long letzteManZeit;
 	private static boolean lsScharf = false;
 	private static boolean manZeitGenommen = false;
 	private static boolean autoZeitGenommen = false;
-	// private static String disLeft;
-	// private static String disRight;
-	private static String zeileEins = "";
-	private static String zeileZwei = "";
-	private static String zeileDrei = "";
-	private static String zeileVier = "";
+	private static String zeileEins = "-";
+	private static String zeileZwei = "-";
+	private static String zeileDrei = "-";
+	private static String zeileVier = "-";
 
 	public static void main(String[] args) throws IOException {
 		props = new Properties();
 		FileInputStream in = new FileInputStream("zeitkiste.ini");
 		props.load(in);
-		standort = props.getProperty("standort"); // Einstellung des Standortes
-		lauf = Integer.parseInt(props.getProperty("lauf")); // Einstellung des Laufes
+		standort = props.getProperty("standort");
+		lauf = Integer.parseInt(props.getProperty("lauf"));
 		gui = new Gui();
 		startliste = new Startliste();
-		database = new Database(props.getProperty("dpip"));
-		connHandler = new ConnectionHandler();
-		webSocketServer = new WebSocketServer(connHandler, standort.equals("Start") ? 2001 : 2002);
-		gpio = new Gpio();
+		//database = new Database(props.getProperty("dpip"));
+		//connHandler = new ConnectionHandler();
+		//webSocketServer = new WebSocketServer(connHandler, standort.equals("Start") ? 2001 : 2002);
+		//gpio = new Gpio();
 		fileMan = new File(standort + "_" + lauf + "_man");
 		fileAuto = new File(standort + "_" + lauf + "_auto");
-		display = new Display();
+		//display = new Display();
+		zeileZwei = "Aktuelle Einstllngn:";
+		zeileDrei = standort + ", " + lauf + ". Lauf";
 		displayAktualisieren();
 		ersteZeileAktualisieren("", "");
 		logView = new LogView();
@@ -64,9 +64,13 @@ public class Zeitkiste {
 		if (pStandort != null) {
 			props.setProperty("standort", pStandort);
 			props.store(out, null);
+			fileMan = new File(standort + "_" + lauf + "_man");
+			fileAuto = new File(standort + "_" + lauf + "_auto"); 
 		} else if (pLauf != 0) {
 			props.setProperty("lauf", Integer.toString(pLauf));
 			props.store(out, null);
+			fileMan = new File(standort + "_" + lauf + "_man");
+			fileAuto = new File(standort + "_" + lauf + "_auto");
 		}
 	}
 
@@ -84,9 +88,9 @@ public class Zeitkiste {
 
 	public void lsAusgeloest() throws IOException {
 		if (lsScharf == true) {
-			letzteAutoZeit = System.currentTimeMillis(); // Zeit in Variable
-			fileAuto.write(startnummer, letzteManZeit); // Zeit in Datei sichern
-			lsScharf = false; // Lichtschranke deaktivieren 
+			letzteAutoZeit = System.currentTimeMillis();
+			fileAuto.write(startnummer, letzteManZeit);
+			lsScharf = false;
 			connHandler.sendToAll(startnummer + "/" + Math.round(letzteAutoZeit / 10d));
 			autoZeitGenommen = true;
 			if (manZeitGenommen == true) {
@@ -177,7 +181,7 @@ public class Zeitkiste {
 	public static void ersteZeileAktualisieren(String pDisLeft, String pDisRight) {
 		zeileEins = df.format(startnummer) + ": " + pDisLeft + " " + pDisRight;
 		gui.virtErsteZeileAktualisieren(zeileEins);
-		display.phyErsteZeileAktualisieren(zeileEins);
+		//display.phyErsteZeileAktualisieren(zeileEins);
 	}
 
 	public static void displayAktualisieren() {
@@ -186,11 +190,11 @@ public class Zeitkiste {
 		zeileZwei = zeileEins;
 		ersteZeileAktualisieren("       ", "        ");
 		gui.virtDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
-		display.phyDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
+		//display.phyDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
 	}
 
 	public String disZeit(long pZeit) {
-		if (pZeit != 0) { // Kuerzt die Zeit runter
+		if (pZeit != 0) {
 			String pString = Long.toString(pZeit);
 			pString = pString.substring(pString.length() - 7, pString.length());
 			return pString;
@@ -221,19 +225,17 @@ public class Zeitkiste {
 		props.store(out, null);
 	}
 
-	public void warnungAusgeben(String pWarnung) {
-		zeileDrei = "Warnung vom Turm:";
-		zeileVier = pWarnung;
-		gui.virtDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
-		display.phyDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
-	}
 	
 	public static String aktuelleZeit() {
 		SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
 	    return date.format(new Date());
 	}
 	
-	public void close() throws SQLException {
+	public void writeLog(String pLog) {
+		logView.write(pLog);
+	}
+	
+	public void close() throws SQLException, IOException {
 		webSocketServer.close();
 		connHandler.closeConnections();
 		database.close();

@@ -33,4 +33,9 @@ public class File {
 			e.printStackTrace();
 		}
 	}
+	
+	public void close() throws IOException {
+		fw.close();
+		bw.close();
+	}
 }

@@ -1,15 +1,14 @@
-
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-public class Database {
+public class Database extends Zeitkiste{
 
 	private static Connection conn;
 	private static Statement stmt;
+	@SuppressWarnings("unused")
 	private static int suc;
 	private static long[] lostInetMan = new long[500];
 	private static long[] lostInetAuto = new long[500];
@@ -19,7 +18,7 @@ public class Database {
 			conn = DriverManager.getConnection("jdbc:mysql://" + pIP + "/zeitmessung?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "root", "");
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
-			System.out.println("Fehler beim Verbindungsaufbau der Datenbank " + e.getMessage());
+			super.writeLog("Fehler beim Verbindungsaufbau der Datenbank " + e.getMessage());
 		}
 	}
 	
