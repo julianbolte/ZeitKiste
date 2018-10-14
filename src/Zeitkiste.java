@@ -22,8 +22,10 @@ public class Zeitkiste {
 	private static Properties props;
 	private static String standort;
 	private static LogView logView;
+	private static UrlPost urlPost;
 	private static DecimalFormat df = new DecimalFormat("000");;
 	private static int lauf;
+	private static String dbip;
 	private int aktuellerIndex = 0;
 	private static int startnummer = 1;
 	private long letzteAutoZeit;
@@ -37,41 +39,39 @@ public class Zeitkiste {
 	private static String zeileVier = "-";
 
 	public static void main(String[] args) throws IOException {
+		logView = new LogView();
 		props = new Properties();
 		FileInputStream in = new FileInputStream("zeitkiste.ini");
 		props.load(in);
 		standort = props.getProperty("standort");
 		lauf = Integer.parseInt(props.getProperty("lauf"));
+		dbip = props.getProperty("dpip");
 		gui = new Gui();
 		startliste = new Startliste();
-		//database = new Database(props.getProperty("dpip"));
-		//connHandler = new ConnectionHandler();
-		//webSocketServer = new WebSocketServer(connHandler, standort.equals("Start") ? 2001 : 2002);
-		//gpio = new Gpio();
+		database = new Database(dbip, standort, lauf);
+		connHandler = new ConnectionHandler();
+		webSocketServer = new WebSocketServer(connHandler, standort.equals("Start") ? 2001 : 2002);
+		gpio = new Gpio();
 		fileMan = new File(standort + "_" + lauf + "_man");
 		fileAuto = new File(standort + "_" + lauf + "_auto");
-		//display = new Display();
+		urlPost = new UrlPost(standort);
+		display = new Display();
 		zeileZwei = "Aktuelle Einstllngn:";
 		zeileDrei = standort + ", " + lauf + ". Lauf";
 		displayAktualisieren();
 		ersteZeileAktualisieren("", "");
-		logView = new LogView();
 		logView.write("Zeitkiste " + getStandort() + ", " + getLauf() + ". Lauf ist einsatzbereit!");
 	}
 
-	public static void einstellungenAendern(String pStandort, int pLauf) throws IOException {
+	public static void laufAendern(int pLauf) throws IOException {
 		FileOutputStream out = new FileOutputStream("standort.ini");
-		if (pStandort != null) {
-			props.setProperty("standort", pStandort);
-			props.store(out, null);
-			fileMan = new File(standort + "_" + lauf + "_man");
-			fileAuto = new File(standort + "_" + lauf + "_auto"); 
-		} else if (pLauf != 0) {
-			props.setProperty("lauf", Integer.toString(pLauf));
-			props.store(out, null);
-			fileMan = new File(standort + "_" + lauf + "_man");
-			fileAuto = new File(standort + "_" + lauf + "_auto");
-		}
+		props.setProperty("lauf", Integer.toString(pLauf));
+		props.store(out, null);
+		out.close();
+		fileMan.close();
+		fileAuto.close();
+		fileMan = new File(standort + "_" + lauf + "_man");
+		fileAuto = new File(standort + "_" + lauf + "_auto");
 	}
 
 	public void setLsScharf() {
@@ -135,6 +135,9 @@ public class Zeitkiste {
 		} else {
 			ersteZeileAktualisieren("", "");
 		}
+		if (autoZeitGenommen == false && letzteManZeit != 0) {
+			urlPost.send(startnummer,letzteManZeit);
+		}
 		manZeitGenommen = false;
 		autoZeitGenommen = false;
 		letzteManZeit = 0;
@@ -152,6 +155,9 @@ public class Zeitkiste {
 			displayAktualisieren();
 		} else {
 			ersteZeileAktualisieren("", "");
+		}
+		if (autoZeitGenommen == false && letzteManZeit != 0) {
+			urlPost.send(startnummer,letzteManZeit);
 		}
 		manZeitGenommen = false;
 		autoZeitGenommen = false;
@@ -181,7 +187,7 @@ public class Zeitkiste {
 	public static void ersteZeileAktualisieren(String pDisLeft, String pDisRight) {
 		zeileEins = df.format(startnummer) + ": " + pDisLeft + " " + pDisRight;
 		gui.virtErsteZeileAktualisieren(zeileEins);
-		//display.phyErsteZeileAktualisieren(zeileEins);
+		display.phyErsteZeileAktualisieren(zeileEins);
 	}
 
 	public static void displayAktualisieren() {
@@ -190,7 +196,7 @@ public class Zeitkiste {
 		zeileZwei = zeileEins;
 		ersteZeileAktualisieren("       ", "        ");
 		gui.virtDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
-		//display.phyDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
+		display.phyDisplayAktualisieren(zeileEins, zeileZwei, zeileDrei, zeileVier);
 	}
 
 	public String disZeit(long pZeit) {
@@ -236,10 +242,15 @@ public class Zeitkiste {
 	}
 	
 	public void close() throws SQLException, IOException {
+		logView.close();
+		urlPost.close();
+		try {
+		database.close();
 		webSocketServer.close();
 		connHandler.closeConnections();
-		database.close();
-		logView.close();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

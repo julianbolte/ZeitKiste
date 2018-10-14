@@ -128,7 +128,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		JMenuItem stnrWechsel = new JMenuItem("Startnummer springen");
 		stnrWechsel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				popup = new PopUpFenster("ZUSTNRSPRINGEN");
+				popup = new PopUpFenster();
 			}
 		});
 		funktionen.add(stnrWechsel);
@@ -227,30 +227,5 @@ public class Gui extends Zeitkiste implements MouseListener{
 		frame.dispose();
 		super.close();
 	}
-	@Override
-	public void mouseClicked(MouseEvent arg0) {
-		// TODO Auto-generated method stub
 		
-	}
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 }
