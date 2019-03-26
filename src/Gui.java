@@ -31,7 +31,6 @@ public class Gui extends Zeitkiste implements MouseListener{
 		try {
 			frame.setTitle(frame.getTitle() + InetAddress.getLocalHost().getHostAddress());
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		frame.setBounds(100, 100, 543, 190);
@@ -55,7 +54,11 @@ public class Gui extends Zeitkiste implements MouseListener{
 		btnUp.setBounds(10, 5, 50, 50);
 		btnUp.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent arg0) {
-				up();
+				try {
+					up();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		panel.add(btnUp);
@@ -66,7 +69,11 @@ public class Gui extends Zeitkiste implements MouseListener{
 		btnDown.setBounds(10, 72, 50, 50);
 		btnDown.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent arg0) {
-				down();
+				try {
+					down();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		panel.add(btnDown);
@@ -90,18 +97,17 @@ public class Gui extends Zeitkiste implements MouseListener{
 			public void mouseClicked(MouseEvent arg0) {
 				try {
 					man();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
+				} catch (IOException | SQLException e) {
 					e.printStackTrace();
 				}
 			}
 		});
 		panel.add(btnMan);
-		lblZeileEins = new JLabel("Zeitkiste ver_0.1");
+		lblZeileEins = new JLabel("Zeitkiste ver_0.9");
 		lblZeileEins.setFont(new Font("Helvetica", Font.BOLD, 16));
 		lblZeileEins.setHorizontalAlignment(SwingConstants.CENTER);
 		disPanel.add(lblZeileEins);
-		lblZeileZwei = new JLabel("Unkorrekte Angaben");
+		lblZeileZwei = new JLabel("Inkorrekte Angaben");
 		lblZeileZwei.setFont(new Font("Helvetica", Font.BOLD, 16));
 		lblZeileZwei.setHorizontalAlignment(SwingConstants.CENTER);
 		disPanel.add(lblZeileZwei);
@@ -139,7 +145,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					lsAus();
-				} catch (IOException e) {
+				} catch (IOException | SQLException e) {
 					e.printStackTrace();
 				}
 			}
@@ -153,7 +159,7 @@ public class Gui extends Zeitkiste implements MouseListener{
 		JMenuItem startliste = new JMenuItem("Neue Startliste laden");
 		startliste.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("startliste neu");
+				startliste();
 			}
 		});
 		einstellungen.add(startliste);
@@ -163,10 +169,8 @@ public class Gui extends Zeitkiste implements MouseListener{
 				try {
 					close();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -176,19 +180,19 @@ public class Gui extends Zeitkiste implements MouseListener{
 		frame.add(panel);
 		frame.setVisible(true);
 	}
-	public void up() {
+	public void up() throws SQLException {
 		super.pressedUp();
 	}
-	public void down() {
+	public void down() throws SQLException {
 		super.pressedDown();
 	}
 	public void auto() {
 		super.setLsScharf();
 	}
-	public void lsAus() throws IOException {
+	public void lsAus() throws IOException, SQLException {
 		super.lsAusgeloest();
 	}
-	public void man() throws IOException {
+	public void man() throws IOException, SQLException {
 		super.manAusgeloest();
 	}
 	public void virtErsteZeileAktualisieren(String pZeileEins) {
@@ -218,9 +222,13 @@ public class Gui extends Zeitkiste implements MouseListener{
 			}
 			frame.setTitle("Zeitkiste " + super.getStandort() + ", " + super.getLauf() + ". Lauf");
 		} else {
-			System.out.println("Error Ocurred: Unbekannte Änderung erwünscht!"); //Fehlermeldung ausgeben
+			System.out.println("Error Ocurred: Unbekannte Änderung erwünscht!");
 		}
 		System.out.println("Einstellungen wurden geändert: " + super.getStandort() + ", " + super.getLauf() + ". Lauf");
+	}
+	
+	public void startliste() {
+		super.neueStartlisteLaden();
 	}
 	
 	public void close() throws SQLException, IOException {

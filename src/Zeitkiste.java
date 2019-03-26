@@ -1,9 +1,9 @@
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 import javax.swing.JOptionPane;
@@ -12,20 +12,17 @@ public class Zeitkiste {
 
 	public static Gpio gpio;
 	public static Gui gui;
-	public static File fileMan;
-	public static File fileAuto;
 	public static Display display;
-	private static Database database;
+	public static Database database;
+	public static Backup backup;
 	private static WebSocketServer webSocketServer;
 	private static ConnectionHandler connHandler;
-	private static Startliste startliste;
+	private static ArrayList<Integer> startliste;
 	private static Properties props;
 	private static String standort;
-	private static LogView logView;
-	private static UrlPost urlPost;
+	private static Bondrucker bondrucker;
 	private static DecimalFormat df = new DecimalFormat("000");;
 	private static int lauf;
-	private static String dbip;
 	private int aktuellerIndex = 0;
 	private static int startnummer = 1;
 	private long letzteAutoZeit;
@@ -39,39 +36,23 @@ public class Zeitkiste {
 	private static String zeileVier = "-";
 
 	public static void main(String[] args) throws IOException {
-		logView = new LogView();
 		props = new Properties();
 		FileInputStream in = new FileInputStream("zeitkiste.ini");
 		props.load(in);
 		standort = props.getProperty("standort");
 		lauf = Integer.parseInt(props.getProperty("lauf"));
-		dbip = props.getProperty("dpip");
-		gui = new Gui();
-		startliste = new Startliste();
-		database = new Database(dbip, standort, lauf);
+		backup = new Backup();
+		new Startliste();
 		connHandler = new ConnectionHandler();
 		webSocketServer = new WebSocketServer(connHandler, standort.equals("Start") ? 2001 : 2002);
 		gpio = new Gpio();
-		fileMan = new File(standort + "_" + lauf + "_man");
-		fileAuto = new File(standort + "_" + lauf + "_auto");
-		urlPost = new UrlPost(standort);
 		display = new Display();
 		zeileZwei = "Aktuelle Einstllngn:";
 		zeileDrei = standort + ", " + lauf + ". Lauf";
-		displayAktualisieren();
-		ersteZeileAktualisieren("", "");
-		logView.write("Zeitkiste " + getStandort() + ", " + getLauf() + ". Lauf ist einsatzbereit!");
-	}
-
-	public static void laufAendern(int pLauf) throws IOException {
-		FileOutputStream out = new FileOutputStream("standort.ini");
-		props.setProperty("lauf", Integer.toString(pLauf));
-		props.store(out, null);
-		out.close();
-		fileMan.close();
-		fileAuto.close();
-		fileMan = new File(standort + "_" + lauf + "_man");
-		fileAuto = new File(standort + "_" + lauf + "_auto");
+		bondrucker = new Bondrucker(standort, lauf);
+		database = new Database(standort, lauf);
+		gui = new Gui();
+		ersteZeileAktualisieren("START", "BEREIT");
 	}
 
 	public void setLsScharf() {
@@ -86,78 +67,90 @@ public class Zeitkiste {
 		}
 	}
 
-	public void lsAusgeloest() throws IOException {
+	public void lsAusgeloest() throws IOException, SQLException {
 		if (lsScharf == true) {
 			letzteAutoZeit = System.currentTimeMillis();
-			fileAuto.write(startnummer, letzteManZeit);
+			backup.log("Erwartete Automatische Zeit: " + startnummer + ", " + letzteAutoZeit);
 			lsScharf = false;
 			connHandler.sendToAll(startnummer + "/" + Math.round(letzteAutoZeit / 10d));
 			autoZeitGenommen = true;
 			if (manZeitGenommen == true) {
 				ersteZeileAktualisieren(disZeit(letzteManZeit), disZeit(letzteAutoZeit));
+				pressedUp();
 			} else if (manZeitGenommen == false) {
 				ersteZeileAktualisieren("       ", disZeit(letzteAutoZeit));
 			}
-			logView.write("     Auto    " + df.format(startnummer) + "   " + letzteAutoZeit);
 		} else {
 			letzteAutoZeit = System.currentTimeMillis();
-			logView.write("!!   Auto    " + df.format(startnummer) + "   " + letzteAutoZeit + "   unerwartet");
+			backup.log("Unerwartete Automatische Zeit: " + startnummer + ", " + letzteAutoZeit);
 		}
 	}
 
-	public void manAusgeloest() throws IOException {
+	public void manAusgeloest() throws IOException, SQLException {
 		if (manZeitGenommen == false) {
 			letzteManZeit = System.currentTimeMillis();
-			fileMan.write(startnummer, letzteManZeit);
+			backup.log("Erwartete Manuelle Zeit: " + startnummer + ", " + letzteManZeit);
 			manZeitGenommen = true;
 			if (autoZeitGenommen == true) {
 				ersteZeileAktualisieren(disZeit(letzteManZeit), disZeit(letzteAutoZeit));
+				pressedUp();
 			} else if (autoZeitGenommen == false && lsScharf == true) {
 				ersteZeileAktualisieren(disZeit(letzteManZeit), "*******");
 			} else if (autoZeitGenommen == false && lsScharf == false) {
 				ersteZeileAktualisieren(disZeit(letzteManZeit), "");
 			}
-			logView.write("     Man     " + df.format(startnummer) + "   " + letzteManZeit);
 		} else {
-			logView.write("!!   Man     " + df.format(startnummer) + "   " + System.currentTimeMillis() + "   unerwartet");
+			backup.log("Zweite Manuelle Zeit: " + startnummer + ", " + System.currentTimeMillis());
 		}
 	}
 
-	public void pressedUp() {
+	public void pressedUp() throws SQLException {
+		if (zeileZwei == "Aktuelle Einstllngn:") {
+			zeileEins = "X";
+			zeileZwei = "X";
+			zeileDrei = "X";
+			zeileVier = "X";
+			displayAktualisieren();
+			aktuellerIndex = -1;
+		}
+		if (autoZeitGenommen == true || manZeitGenommen == true) {
+			backup.save(startnummer, letzteAutoZeit, letzteManZeit);
+			bondrucker.drucken(startnummer, letzteManZeit, letzteAutoZeit);
+			Database.update(startnummer, letzteManZeit, letzteAutoZeit);
+		}
 		aktuellerIndex++;
-		if (aktuellerIndex > startliste.getStnrListe().size() - 1) {
+		if (aktuellerIndex > startliste.size() - 1) {
 			aktuellerIndex = 0;
 		}
-		startnummer = startliste.getStnrListe().get(aktuellerIndex);
+		startnummer = startliste.get(aktuellerIndex);
 		lsScharf = false;
 		if (manZeitGenommen == true || autoZeitGenommen == true) {
 			displayAktualisieren();
 		} else {
 			ersteZeileAktualisieren("", "");
-		}
-		if (autoZeitGenommen == false && letzteManZeit != 0) {
-			urlPost.send(startnummer,letzteManZeit);
-		}
+		}		
 		manZeitGenommen = false;
 		autoZeitGenommen = false;
 		letzteManZeit = 0;
 		letzteAutoZeit = 0;
 	}
 
-	public void pressedDown() {
+	public void pressedDown() throws SQLException {
+		if (autoZeitGenommen == true || manZeitGenommen == true) {
+			backup.save(startnummer, letzteAutoZeit, letzteManZeit);
+			bondrucker.drucken(startnummer, letzteManZeit, letzteAutoZeit);
+			Database.update(startnummer, letzteManZeit, letzteAutoZeit);
+		}
 		aktuellerIndex--;
 		if (aktuellerIndex < 0) {
-			aktuellerIndex = startliste.getStnrListe().size() - 1;
+			aktuellerIndex = startliste.size() - 1;
 		}
-		startnummer = startliste.getStnrListe().get(aktuellerIndex);
+		startnummer = startliste.get(aktuellerIndex);
 		lsScharf = false;
 		if (manZeitGenommen == true || autoZeitGenommen == true) {
 			displayAktualisieren();
 		} else {
 			ersteZeileAktualisieren("", "");
-		}
-		if (autoZeitGenommen == false && letzteManZeit != 0) {
-			urlPost.send(startnummer,letzteManZeit);
 		}
 		manZeitGenommen = false;
 		autoZeitGenommen = false;
@@ -167,8 +160,8 @@ public class Zeitkiste {
 	}
 
 	public void zuStnrSpringen(int pStartnummer) {
-		if (startliste.getStnrListe().contains(pStartnummer)) {
-			aktuellerIndex = startliste.getStnrListe().indexOf(pStartnummer);
+		if (startliste.contains(pStartnummer)) {
+			aktuellerIndex = startliste.indexOf(pStartnummer);
 			startnummer = pStartnummer;
 			if (manZeitGenommen == true || autoZeitGenommen == true) {
 				displayAktualisieren();
@@ -216,38 +209,30 @@ public class Zeitkiste {
 	public static int getLauf() {
 		return lauf;
 	}
-
-	public void setStandort(String pStandort) throws IOException {
-		standort = pStandort;
-		FileOutputStream out = new FileOutputStream("zeitkiste.ini");
-		props.setProperty("standort", pStandort);
-		props.store(out, null);
-	}
-
-	public void setLauf(int pLauf) throws IOException {
-		lauf = pLauf;
-		FileOutputStream out = new FileOutputStream("zeitkiste.ini");
-		props.setProperty("lauf", Integer.toString(pLauf));
-		props.store(out, null);
-	}
-
 	
 	public static String aktuelleZeit() {
 		SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
 	    return date.format(new Date());
 	}
 	
-	public void writeLog(String pLog) {
-		logView.write(pLog);
+	public void neueStartliste(ArrayList<Integer> pStartliste) {
+		startliste = pStartliste;
+		aktuellerIndex = 0;
+		startnummer = startliste.get(aktuellerIndex);
+		manZeitGenommen = false;
+		autoZeitGenommen = false;
+		letzteManZeit = 0;
+		letzteAutoZeit = 0;
+	}
+	
+	public void neueStartlisteLaden() {
+		new Startliste();
 	}
 	
 	public void close() throws SQLException, IOException {
-		logView.close();
-		urlPost.close();
 		try {
-		database.close();
-		webSocketServer.close();
-		connHandler.closeConnections();
+			webSocketServer.close();
+			connHandler.closeConnections();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}

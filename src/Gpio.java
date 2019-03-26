@@ -1,6 +1,7 @@
 
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -36,8 +37,7 @@ public class Gpio  extends Zeitkiste{
 				if (event.getState() == PinState.HIGH){
 					try {
 						vButtonM();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
+					} catch (IOException | SQLException e) {
 						e.printStackTrace();
 					}
 				}
@@ -47,7 +47,11 @@ public class Gpio  extends Zeitkiste{
 			@Override
 			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event){
 				if (event.getState() == PinState.HIGH){
-					vButtonUp();
+					try {
+						vButtonUp();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -55,7 +59,11 @@ public class Gpio  extends Zeitkiste{
 			@Override
 			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event){
 				if (event.getState() == PinState.HIGH){
-					vButtonDown();
+					try {
+						vButtonDown();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -65,8 +73,7 @@ public class Gpio  extends Zeitkiste{
 				if (event.getState() == PinState.HIGH){
 					try {
 						vLichtschranke();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
+					} catch (IOException | SQLException e) {
 						e.printStackTrace();
 					}
 				}
@@ -74,19 +81,19 @@ public class Gpio  extends Zeitkiste{
 		});
 		
 	}
-	public void vButtonUp() {
+	public void vButtonUp() throws SQLException {
 		super.pressedUp();
 	}
-	public void vButtonDown() {
+	public void vButtonDown() throws SQLException {
 		super.pressedDown();
 	}
 	public void vButtonA() {
 		super.setLsScharf();
 	}
-	public void vButtonM() throws IOException {
+	public void vButtonM() throws IOException, SQLException {
 		super.manAusgeloest();
 	}
-	public void vLichtschranke() throws IOException {
+	public void vLichtschranke() throws IOException, SQLException {
 		super.lsAusgeloest();
 	}
 }
